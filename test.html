@@ -1,0 +1,44 @@
+<html>
+    <head>
+        <script src="fraction.js"></script>
+    </head>
+    <body>
+        <canvas width="300" height="300" id="canvas" style="/*border: 1px solid black*/"></canvas>
+        <button onclick="render(nextFraction());">Test another one</button>
+        <button onclick="toggleDebug()">Toggle debug mode</button>
+        <script>
+            var button = document.querySelector('button'),
+                canvas = document.querySelector('canvas'),
+                context = canvas.getContext('2d'),
+                fractions = [
+                    new Fraction(2,3),
+                    new Fraction(1,25352),
+                    new Fraction(3235,5),
+                    new Fraction([25, '+', 34], 45),
+                    new Fraction(2124,new Fraction(2,4)),
+                    new Fraction(new Fraction(2,4), 124),
+                    new Fraction(new Fraction(2,4), new Fraction(124,15)),
+                    new Fraction(new Fraction(124,15), new Fraction(1,7))
+                ];
+
+            toggleDebug = function () {
+                debug=!debug;
+                context.fillStyle = 'black';
+                render(fractions[fractions.length - 1]);
+            }
+
+            nextFraction = function () {
+                var fraction = fractions.splice(0, 1);
+                fractions.push(fraction);
+                return fraction;
+            };
+            
+            render = function (fraction) {
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                fraction.drawOn(context);
+            };
+
+            render(nextFraction());
+        </script>
+    </body>
+</html>
