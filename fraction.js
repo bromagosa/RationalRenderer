@@ -11,7 +11,7 @@ function parseFraction (aString) {
             '\/',
             ','
         ).replace(
-            /[\+\-\*]+/gi,
+            /[\+\-\*·]+/gi,
             (match) => "'" + match + "'"
         ).replaceAll(
             '*',

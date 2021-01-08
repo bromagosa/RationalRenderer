@@ -4,8 +4,18 @@
     </head>
     <body>
         <canvas width="300" height="300" id="canvas" style="/*border: 1px solid black*/"></canvas>
-        <button onclick="render(nextFraction());">Test another one</button>
-        <button onclick="toggleDebug()">Toggle debug mode</button>
+        <p>
+            <button onclick="render(nextFraction());">Test another one</button>
+            <button onclick="toggleDebug()">Toggle debug mode</button>
+        </p>
+        <h4>Textual format notes</h4>
+        <p>All fractions need to be parenthesized.</p>
+        <p>All non-fractional parts of a numerator or denominator need to be enclosed by brackets and separated by commas.</p>
+        <p>Ex. ([1, +, (1 / 4)] / [1, -, (1 / [2, *, 6])])</p>
+        <p>
+            <input size="50" value="([(2 / 3), +, ([4, *, 45] / 123)] / 15)"></input>
+            <button onclick="render(parseFraction(document.querySelector('input').value))">Parse and render</button>
+        </p>
         <script>
             var button = document.querySelector('button'),
                 fractions = [
