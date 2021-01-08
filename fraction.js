@@ -20,24 +20,24 @@ function parseFraction (aString) {
     );
 };
 
-function Fraction (numerator, denominator, fontSize) {
+function Fraction (numerator, denominator) {
     this.init(numerator, denominator);
 };
 
-Fraction.prototype.init = function (numerator, denominator, fontSize) {
+Fraction.prototype.init = function (numerator, denominator) {
     this.numerator = numerator;
     this.denominator = denominator;
-    this.fontSize = fontSize || 32;
     this.isFraction = true;
 };
 
 Fraction.debug = false;
+Fraction.fontSize = 32;
 
-Fraction.prototype.drawOn = function (context, fontSize, x, y, totalWidth) {
+Fraction.prototype.drawOn = function (context, x, y, totalWidth) {
     var x = x || 0,
         y = y || 0,
-        fontSize = fontSize || this.fontSize,
-        width = this.width(fontSize),
+        fontSize = Fraction.fontSize,
+        width = this.width(),
         totalWidth = totalWidth || width;
 
     if (Fraction.debug) {
@@ -48,7 +48,7 @@ Fraction.prototype.drawOn = function (context, fontSize, x, y, totalWidth) {
             Math.floor(Math.random() * 255) + ',' +
             Math.floor(Math.random() * 255) + ',' +
             Math.floor(Math.random() * 255) + ')';
-        context.rect(x,y,width,this.height(fontSize));
+        context.rect(x, y, width, this.height());
         context.stroke();
         context.restore();
     }
@@ -56,11 +56,10 @@ Fraction.prototype.drawOn = function (context, fontSize, x, y, totalWidth) {
     context.save();
     this.numerator.drawOn(
         context,
-        fontSize,
         x +
             (this.numerator.isFraction ?
-                (totalWidth - this.numerator.width(fontSize)) / 2 :
-                (width - this.numerator.width(fontSize)) / 2
+                (totalWidth - this.numerator.width()) / 2 :
+                (width - this.numerator.width()) / 2
             ),
         y,
         totalWidth
@@ -69,7 +68,7 @@ Fraction.prototype.drawOn = function (context, fontSize, x, y, totalWidth) {
 
     // line
     context.lineWidth = Math.max(fontSize / 12, 1);
-    y += this.numerator.height(fontSize) + context.lineWidth;
+    y += this.numerator.height() + context.lineWidth;
     context.save();
     context.beginPath();
     context.moveTo(x, y);
@@ -80,11 +79,10 @@ Fraction.prototype.drawOn = function (context, fontSize, x, y, totalWidth) {
 
     this.denominator.drawOn(
         context,
-        fontSize,
         x +
             (this.denominator.isFraction ?
-                (totalWidth - this.denominator.width(fontSize)) / 2 :
-                (width - this.denominator.width(fontSize)) / 2
+                (totalWidth - this.denominator.width()) / 2 :
+                (width - this.denominator.width()) / 2
             ),
         y + context.lineWidth * 2,
         totalWidth
@@ -92,11 +90,12 @@ Fraction.prototype.drawOn = function (context, fontSize, x, y, totalWidth) {
 
 };
 
-Fraction.prototype.width = function (fontSize) {
-    var width = Math.max(
-        this.numerator.width(fontSize),
-        this.denominator.width(fontSize)
-    );
+Fraction.prototype.width = function () {
+    var fontSize = Fraction.fontSize,
+        width = Math.max(
+            this.numerator.width(fontSize),
+            this.denominator.width(fontSize)
+        );
 
     if (this.numerator.isFraction || this.denominator.isFraction) {
         width += fontSize;
@@ -106,39 +105,40 @@ Fraction.prototype.width = function (fontSize) {
 };
 
 Fraction.prototype.height = function () {
-    var lineWidth = Math.max(this.fontSize / 12, 1);
-    return this.numerator.height(this.fontSize) +
-        this.denominator.height(this.fontSize) + lineWidth * 4;
+    var fontSize = Fraction.fontSize,
+        lineWidth = Math.max(fontSize / 12, 1);
+    return this.numerator.height(fontSize) +
+        this.denominator.height(fontSize) + lineWidth * 4;
 };
 
 // String methods
 
-String.prototype.textMetrics = function (fontSize) {
+String.prototype.textMetrics = function () {
     var context = document.createElement('canvas').getContext('2d'),
         metrics;
-    context.font = fontSize + 'px monospace';
+    context.font = Fraction.fontSize + 'px monospace';
     context.fillText(this, 0, 0);
     return context.measureText(this);
 };
 
-String.prototype.width =  function (fontSize) {
-    return this.textMetrics(fontSize).width;
+String.prototype.width =  function () {
+    return this.textMetrics().width;
 };
 
-String.prototype.height = function (fontSize) {
+String.prototype.height = function () {
     // The "proper way" is broken:
     /*
     var metrics = this.textMetrics(fontSize);
     return metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
     */
-    return fontSize;
+    return Fraction.fontSize;
 };
 
-String.prototype.drawOn = function (context, fontSize, x, y, totalWidth) {
+String.prototype.drawOn = function (context, x, y, totalWidth) {
     context.save();
     context.textAlign = 'left';
     context.textBaseline = 'top';
-    context.font = fontSize + 'px monospace';
+    context.font = Fraction.fontSize + 'px monospace';
     if (Fraction.debug) {
         context.fillStyle =
             'rgba(' +
@@ -155,45 +155,44 @@ String.prototype.drawOn = function (context, fontSize, x, y, totalWidth) {
 
 // Number methods
 
-Number.prototype.width = function (fontSize) {
-    return this.toString().width(fontSize);
+Number.prototype.width = function () {
+    return this.toString().width();
 };
 
-Number.prototype.height = function (fontSize) {
-    return this.toString().height(fontSize);
+Number.prototype.height = function () {
+    return this.toString().height();
 }
 
-Number.prototype.drawOn = function (context, fontSize, x, y, totalWidth) {
-    this.toString().drawOn(context, fontSize, x, y, totalWidth);
+Number.prototype.drawOn = function (context, x, y, totalWidth) {
+    this.toString().drawOn(context, x, y, totalWidth);
 };
 
 // Array methods
 
-Array.prototype.width = function (fontSize) {
-    const reducer = (acc, each) => acc + each.width(fontSize);
+Array.prototype.width = function () {
+    const reducer = (acc, each) => acc + each.width();
     return this.reduce(reducer, 0);
 };
 
-Array.prototype.height = function (fontSize) {
-    const reducer = (acc, each) => Math.max(acc, each.height(fontSize));
+Array.prototype.height = function () {
+    const reducer = (acc, each) => Math.max(acc, each.height());
     return this.reduce(reducer, 0);
 };
 
-Array.prototype.drawOn = function (context, fontSize, x, y, totalWidth) {
+Array.prototype.drawOn = function (context, x, y, totalWidth) {
     var x = x,
         y = y,
-        height = this.height(fontSize);
+        height = this.height();
 
     this.forEach(
         each => {
             each.drawOn(
                 context,
-                fontSize,
                 x,
-                y + (height - each.height(fontSize)) / 2,
+                y + (height - each.height()) / 2,
                 totalWidth
             );
-            x += each.width(fontSize);
+            x += each.width();
         }
     );
 };
