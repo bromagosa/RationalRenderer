@@ -8,22 +8,21 @@
         <button onclick="toggleDebug()">Toggle debug mode</button>
         <script>
             var button = document.querySelector('button'),
-                canvas = document.querySelector('canvas'),
-                context = canvas.getContext('2d'),
                 fractions = [
-                    new Fraction(2,3),
                     new Fraction(1,25352),
                     new Fraction(3235,5),
                     new Fraction([25, '+', 34], 45),
                     new Fraction(2124,new Fraction(2,4)),
                     new Fraction(new Fraction(2,4), 124),
+                    new Fraction(new Fraction(13,1512), new Fraction('c','de')),
                     new Fraction(new Fraction(2,4), new Fraction(124,15)),
-                    new Fraction(new Fraction(124,15), new Fraction(1,7))
+                    new Fraction(new Fraction(124,15), new Fraction(1,7)),
+                    new Fraction([3, '+', new Fraction(1,2)], 156),
+                    new Fraction(156, [3, '+', new Fraction(1,2)])
                 ];
 
             toggleDebug = function () {
                 debug=!debug;
-                context.fillStyle = 'black';
                 render(fractions[fractions.length - 1]);
             }
 
@@ -34,6 +33,8 @@
             };
             
             render = function (fraction) {
+                var canvas = document.querySelector('canvas'),
+                    context = canvas.getContext('2d');
                 context.clearRect(0, 0, canvas.width, canvas.height);
                 fraction.drawOn(context);
             };

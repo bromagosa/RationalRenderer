@@ -8,6 +8,7 @@ Fraction.prototype.init = function (numerator, denominator, fontSize) {
     this.numerator = numerator;
     this.denominator = denominator;
     this.fontSize = fontSize || 32;
+    this.isFraction = true;
 };
 
 Fraction.prototype.drawOn = function (context, fontSize, x, y) {
@@ -40,11 +41,17 @@ Fraction.prototype.drawOn = function (context, fontSize, x, y) {
     );
 };
 
-Fraction.prototype.width = function () {
-    return Math.max(
-        this.numerator.width(this.fontSize),
-        this.denominator.width(this.fontSize)
+Fraction.prototype.width = function (fontSize) {
+    var width = Math.max(
+        this.numerator.width(fontSize),
+        this.denominator.width(fontSize)
     );
+
+    if (this.numerator.isFraction || this.denominator.isFraction) {
+        width += fontSize;
+    }
+
+    return width;
 };
 
 Fraction.prototype.height = function () {
@@ -80,6 +87,7 @@ String.prototype.drawOn = function (context, fontSize, x, y) {
     context.textAlign = 'left';
     context.textBaseline = 'top'; 
     context.font = fontSize + 'px monospace';
+    context.fillStyle = 'black';
     if (debug) {
         context.beginPath();
         context.fillStyle =
@@ -122,10 +130,17 @@ Array.prototype.height = function (fontSize) {
 };
 
 Array.prototype.drawOn = function (context, fontSize, x, y) {
-    var x = x, y = y;
+    var x = x,
+        y = y,
+        height = this.height(fontSize);
+
     this.forEach(
         each => {
-            each.drawOn(context, fontSize, x, y);
+            each.drawOn(
+                context,
+                fontSize,
+                x,
+                y + (height - each.height(fontSize)) / 2);
             x += each.width(fontSize);
         }
     );
