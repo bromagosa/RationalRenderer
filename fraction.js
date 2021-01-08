@@ -1,4 +1,26 @@
-function Fraction (numerator, denominator) {
+function parseFraction (aString) {
+    // * All fractions need to be parenthesized
+    // * All non-fractional parts of a numerator or denominator need to be enclosed by brackets
+    //   and separated by commas
+    // Ex: ([(2/3),+,([4,*,45]/123)]/15)
+    return eval(
+        aString.replace(
+            /\(/gi,
+            (match) => 'new Fraction' + match + ''
+        ).replaceAll(
+            '\/',
+            ','
+        ).replace(
+            /[\+\-\*]+/gi,
+            (match) => "'" + match + "'"
+        ).replaceAll(
+            '*',
+            '×'
+        )
+    );
+};
+
+function Fraction (numerator, denominator, fontSize) {
     this.init(numerator, denominator);
 };
 
@@ -47,14 +69,14 @@ Fraction.prototype.drawOn = function (context, fontSize, x, y, totalWidth) {
 
     // line
     context.lineWidth = Math.max(fontSize / 12, 1);
-    y += this.numerator.height(fontSize) + context.lineWidth * 2;
+    y += this.numerator.height(fontSize) + context.lineWidth;
     context.save();
     context.beginPath();
     context.moveTo(x, y);
     context.lineTo(x + width, y);
     context.stroke();
     context.restore();
-    y += context.lineWidth * 2;
+    y += context.lineWidth;
 
     this.denominator.drawOn(
         context,
@@ -64,7 +86,7 @@ Fraction.prototype.drawOn = function (context, fontSize, x, y, totalWidth) {
                 (totalWidth - this.denominator.width(fontSize)) / 2 :
                 (width - this.denominator.width(fontSize)) / 2
             ),
-        y,
+        y + context.lineWidth * 2,
         totalWidth
     );
 
