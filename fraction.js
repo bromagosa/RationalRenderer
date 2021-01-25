@@ -1,7 +1,68 @@
+function renderText (aString, canvas, fontSize) {
+    // Takes a pseudo-markdown string, possibly containing fractions, and
+    // returns a canvas where the string has been parsed and rendered
+    var ctx = canvas.getContext('2d'),
+        y = 0, x = 0,
+        fontSize = fontSize || 32;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.font = fontSize + 'px Arial';
+    ctx.fillStyle = 'black';
+
+    aString.split('\n').forEach(line => {
+        x = 0;
+        line.split('').forEach((character, i) => {
+            switch (character) {
+                case '*':
+                    if (isMarker(line, i)) {
+                        if (ctx.font.includes('bold ')) {
+                            ctx.font = ctx.font.replace('bold ', '');
+                        } else {
+                            ctx.font = 'bold ' + ctx.font;
+                        }
+                    } else {
+                        doPaint(character);
+                    }
+                    break;
+                case '_':
+                    if (isMarker(line, i)) {
+                        if (ctx.font.includes('italic ')) {
+                            ctx.font = ctx.font.replace('italic ', '');
+                        } else {
+                            ctx.font = 'italic ' + ctx.font;
+                        }
+                    } else {
+                        doPaint(character);
+                    }
+                    break;
+                default:
+                    doPaint(character);
+                    break;
+            }
+
+            function doPaint(character) {
+                ctx.fillText(character, x, y);
+                x += ctx.measureText(character).width;
+            };
+        });
+        y += fontSize;
+    });
+
+    function isMarker (line, i) {
+        return ((line[i-1] && line[i-1] !== ' ') || (!line[i-1])) &&
+            ((line[i+1] && line[i+1] !== ' ') || (!line[i+1]));
+    };
+
+    return canvas;
+};
+
 function parseFraction (aString) {
     // * All fractions need to be parenthesized
-    // * All non-fractional parts of a numerator or denominator need to be enclosed by brackets
-    //   and separated by commas
+    // * All non-fractional parts of a numerator or denominator need to be
+    //   enclosed by brackets and separated by commas
     // Ex: ([(2/3),+,([4,*,45]/123)]/15)
     return eval(
         aString.replace(

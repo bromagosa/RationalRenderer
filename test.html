@@ -16,6 +16,10 @@
             <input size="50" value="([(2 / 3), +, ([4, *, 45] / 123)] / 15)"></input>
             <button onclick="render(parseFraction(document.querySelector('input').value))">Parse and render</button>
         </p>
+        <p>
+            <textarea></textarea>
+            <button onclick="renderText(document.querySelector('textarea').value, document.querySelector('canvas'))">Parse and render</button>
+        </p>
         <script>
             var button = document.querySelector('button'),
                 fractions = [
